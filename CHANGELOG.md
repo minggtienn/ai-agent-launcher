@@ -88,3 +88,45 @@ Connect the local project to its approved GitHub repository.
 - Ticket: LAU-002
 - Pull request: Not created
 - API/schema/design: Not applicable
+
+## [LAU-003] Implement desktop launcher login screen
+
+- Date: 2026-09-03
+- Author: Codex (requested by project owner)
+- Type: Added, Changed
+- Module: authentication presentation, desktop window
+- Environments: all
+- Breaking change: No
+- Migration/configuration: No
+
+### Purpose
+
+Implement the first desktop screen based on the approved launcher reference.
+
+### Changes
+
+- Added a responsive campaign, news and login split layout.
+- Added branded login controls, validation, password visibility and secondary actions.
+- Added a hidden desktop title bar, drag area, window controls and initial size.
+- Kept campaign artwork behind a replaceable widget until final image assets are supplied.
+
+### Before and after
+
+- Before: Generic centered Material login card.
+- After: Desktop-first launcher login matching the reference composition.
+
+### Verification
+
+- `fvm flutter analyze`: passed with no issues.
+- `fvm flutter test`: passed, including the 1280x720 login layout test.
+
+### Risks and rollback
+
+- Final visual fidelity depends on receiving the original banner, logo and news assets.
+- Rollback by reverting this task after explicit owner approval.
+
+### References
+
+- Ticket: LAU-003
+- Pull request: Not created
+- API/schema/design: User-provided login screen reference
