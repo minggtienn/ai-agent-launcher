@@ -1,0 +1,12 @@
+* @code-leader
+/lib/**/presentation/ @ui-team @feature-owners
+/lib/**/domain/ @feature-owners @code-leader
+/lib/**/data/ @feature-owners
+/lib/core/security/ @security-team @code-leader
+/lib/features/updater/ @release-team @security-team
+/lib/features/download/ @release-team @code-leader
+/windows/ @windows-team @release-team
+/.github/workflows/ @devops-team @security-team
+/pubspec.yaml @code-leader
+/.fvmrc @code-leader
+/CHANGELOG.md @code-leader
