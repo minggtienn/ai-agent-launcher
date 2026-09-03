@@ -130,3 +130,45 @@ Implement the first desktop screen based on the approved launcher reference.
 - Ticket: LAU-003
 - Pull request: Not created
 - API/schema/design: User-provided login screen reference
+
+## [LAU-004] Add portable chat context
+
+- Date: 2026-09-03
+- Author: Codex (requested by project owner)
+- Type: Added, Documentation
+- Module: project communication, governance
+- Environments: all
+- Breaking change: No
+- Migration/configuration: No
+
+### Purpose
+
+Allow project context to move safely between machines and chat platforms.
+
+### Changes
+
+- Added `CHAT_CONTEXT.md` with the current compressed project context.
+- Defined the process for snapshots by day or requested point in time.
+- Preserved authorization boundaries so a snapshot never grants edit or Git
+  permissions to another agent.
+
+### Before and after
+
+- Before: Project context depended on the current conversation.
+- After: A structured, portable context file can bootstrap another session.
+
+### Verification
+
+- Checked the snapshot against `AGENTS.md`, recent changelog entries and Git
+  repository state.
+
+### Risks and rollback
+
+- Snapshots can become stale; repository state remains the source of truth.
+- Rollback by reverting this task after explicit owner approval.
+
+### References
+
+- Ticket: LAU-004
+- Pull request: Not created
+- API/schema/design: `CHAT_CONTEXT.md`
