@@ -33,6 +33,9 @@ void main() {
       const AppConfig(
         environment: AppEnvironment.development,
         apiBaseUrl: 'https://example.invalid',
+        launcherUpdateManifestUrl: '',
+        launcherUpdatePublicKey: '',
+        allowUnsignedUpdates: false,
       ),
     );
   });

@@ -2,6 +2,7 @@ import 'package:ai_agent_launcher/app/di/service_locator.dart';
 import 'package:ai_agent_launcher/app/router/app_router.dart';
 import 'package:ai_agent_launcher/app/theme/app_theme.dart';
 import 'package:ai_agent_launcher/features/authentication/presentation/bloc/session_bloc.dart';
+import 'package:ai_agent_launcher/features/updater/presentation/bloc/launcher_update_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -11,9 +12,19 @@ final class LauncherApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-          serviceLocator<SessionBloc>()..add(const SessionRestoreRequested()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) =>
+              serviceLocator<SessionBloc>()
+                ..add(const SessionRestoreRequested()),
+        ),
+        BlocProvider(
+          create: (_) =>
+              serviceLocator<LauncherUpdateBloc>()
+                ..add(const LauncherUpdateCheckRequested()),
+        ),
+      ],
       child: MaterialApp.router(
         title: 'AI Agent Launcher',
         debugShowCheckedModeBanner: false,

@@ -35,7 +35,13 @@ a standard user and requests elevation only for an explicitly approved action.
 
 ## Updates
 
-Managed applications use a signed manifest, resumable full-file downloads,
-SHA-256 verification, staging installation and one-version rollback. Launcher
-self-update uses WinSparkle. Production executables and update feeds must be
-signed and verified on Windows.
+Launcher startup is gated by a signed update manifest. It downloads a resumable
+ZIP, verifies size, SHA-256 and Ed25519 signature, then extracts to a sibling
+staging directory. To avoid a second updater project, the launcher copies its
+own runtime to a temporary directory and starts that executable in apply mode.
+The temporary process switches directories, starts the new launcher, waits for
+a health marker and rolls back when startup fails.
+
+Production executables, manifests and update artifacts must be signed. Game
+patch updates are intentionally deferred to a separate task and will reuse the
+download, integrity and progress concepts without sharing launcher apply logic.

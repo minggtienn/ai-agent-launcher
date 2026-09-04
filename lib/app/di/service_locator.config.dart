@@ -28,6 +28,14 @@ import 'package:ai_agent_launcher/features/authentication/domain/usecases/sign_o
     as _i75;
 import 'package:ai_agent_launcher/features/authentication/presentation/bloc/session_bloc.dart'
     as _i1009;
+import 'package:ai_agent_launcher/features/updater/data/repositories/rest_launcher_update_repository.dart'
+    as _i852;
+import 'package:ai_agent_launcher/features/updater/domain/repositories/launcher_update_repository.dart'
+    as _i805;
+import 'package:ai_agent_launcher/features/updater/infrastructure/launcher_update_applier.dart'
+    as _i1066;
+import 'package:ai_agent_launcher/features/updater/presentation/bloc/launcher_update_bloc.dart'
+    as _i201;
 import 'package:dio/dio.dart' as _i361;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart' as _i558;
 import 'package:get_it/get_it.dart' as _i174;
@@ -46,6 +54,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.secureStorage,
     );
     gh.lazySingleton<_i207.Talker>(() => registerModule.logger);
+    gh.lazySingleton<_i1066.LauncherUpdateApplier>(
+      () => const _i1066.LauncherUpdateApplier(),
+    );
     gh.lazySingleton<_i28.SecureTokenStore>(
       () => _i106.SecureTokenStoreImpl(gh<_i558.FlutterSecureStorage>()),
     );
@@ -63,12 +74,22 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i891.SignIn>(() => _i891.SignIn(gh<_i20.AuthRepository>()));
     gh.factory<_i75.SignOut>(() => _i75.SignOut(gh<_i20.AuthRepository>()));
+    gh.lazySingleton<_i805.LauncherUpdateRepository>(
+      () => _i852.RestLauncherUpdateRepository(
+        gh<_i361.Dio>(),
+        gh<_i350.AppConfig>(),
+        gh<_i1066.LauncherUpdateApplier>(),
+      ),
+    );
     gh.factory<_i1009.SessionBloc>(
       () => _i1009.SessionBloc(
         gh<_i891.SignIn>(),
         gh<_i1048.RestoreSession>(),
         gh<_i75.SignOut>(),
       ),
+    );
+    gh.factory<_i201.LauncherUpdateBloc>(
+      () => _i201.LauncherUpdateBloc(gh<_i805.LauncherUpdateRepository>()),
     );
     return this;
   }

@@ -172,3 +172,53 @@ Allow project context to move safely between machines and chat platforms.
 - Ticket: LAU-004
 - Pull request: Not created
 - API/schema/design: `CHAT_CONTEXT.md`
+
+## [LAU-005] Implement launcher self-update foundation
+
+- Date: 2026-09-04
+- Author: Codex (requested by project owner)
+- Type: Added, Changed, Security
+- Module: launcher updater, startup routing, Windows lifecycle
+- Environments: all
+- Breaking change: No
+- Migration/configuration: Configure launcher manifest URL and Ed25519 public key
+
+### Purpose
+
+Update the launcher before login with a Discord-style progress experience while
+avoiding a separately maintained updater application.
+
+### Changes
+
+- Added manifest checking, resumable ZIP download, size/SHA-256/signature checks
+  and safe staging extraction.
+- Added a startup update BLoC and compact updater screen before login.
+- Added a self-copy apply mode that switches launcher directories, performs a
+  startup health check and rolls back on failure.
+- Added update configuration, tests and release documentation.
+- Deferred game patching and game disk configuration to the next approved task.
+
+### Before and after
+
+- Before: Updater existed only as an empty domain interface.
+- After: Launcher updates are checked and prepared before login, with a Windows
+  self-apply path and rollback protection.
+
+### Verification
+
+- Injectable code generation completed successfully.
+- `fvm flutter analyze`: passed with no issues.
+- `fvm flutter test`: passed, 8 tests.
+- `git diff --check`: passed.
+- Final apply/rollback must also be tested using signed artifacts on Windows.
+
+### Risks and rollback
+
+- Installation directory must be writable and staging must remain on the same volume.
+- Rollback by reverting this task after explicit owner approval.
+
+### References
+
+- Ticket: LAU-005
+- Pull request: Not created
+- API/schema/design: `docs/architecture.md`
