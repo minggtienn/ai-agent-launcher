@@ -49,6 +49,97 @@ Architecture, BLoC/Cubit, GetIt/Injectable and REST-oriented contracts.
 - Pull request: Not created
 - API/schema/design: `docs/architecture.md`
 
+## [LAU-006] Refresh portable chat context after launcher updater
+
+- Date: 2026-09-07
+- Author: Codex (requested by project owner)
+- Type: Changed, Documentation
+- Module: project communication, governance
+- Environments: all
+- Breaking change: No
+- Migration/configuration: No
+
+### Purpose
+
+Transfer the latest launcher updater decisions, implementation state and game
+updater roadmap to another machine or chat platform.
+
+### Changes
+
+- Replaced the current portable snapshot with `CTX-20260907-002`.
+- Archived the previous `CTX-20260903-001` snapshot.
+- Added the implemented self-update flow, local Windows test recipe, game patch
+  decisions, current limitations and next tasks.
+
+### Before and after
+
+- Before: Portable context stopped before launcher updater implementation.
+- After: Portable context matches commit `6e02978` and the latest discussion.
+
+### Verification
+
+- Compared the snapshot with Git status/log, `CHANGELOG.md` and the latest
+  recorded analyzer/test results.
+
+### Risks and rollback
+
+- Repository state remains the source of truth if the snapshot becomes stale.
+- Rollback by reverting this task after explicit owner approval.
+
+### References
+
+- Ticket: LAU-006
+- Pull request: Not created
+- API/schema/design: `CHAT_CONTEXT.md`
+
+## [LAU-007] Document Windows local launcher update test
+
+- Date: 2026-09-07
+- Author: Codex (requested by project owner)
+- Type: Added, Changed, Documentation
+- Module: launcher updater, project communication
+- Environments: development, Windows local
+- Breaking change: No
+- Migration/configuration: No
+
+### Purpose
+
+Provide a reproducible, step-by-step Windows procedure for validating the
+launcher self-update flow locally and mark where future chat compression starts.
+
+### Changes
+
+- Added a Windows local test guide covering two-version builds, ZIP packaging,
+  manifest generation, local HTTP hosting, apply verification and failure cases.
+- Documented the current limitation around rollback fault injection and HTTP
+  Range support in local static servers.
+- Added `BASELINE-20260907-001` so the next requested chat snapshot starts with
+  discussion after this point.
+
+### Before and after
+
+- Before: Local updater testing existed only as a short recipe in chat context.
+- After: Windows testers have an executable checklist and future snapshots have
+  an explicit conversation baseline.
+
+### Verification
+
+- Cross-checked commands, manifest fields and expected folders against the
+  current updater implementation.
+- Documentation-only change; no Flutter build or test was run.
+
+### Risks and rollback
+
+- Exact Windows behavior still requires execution on a Windows machine.
+- Rollback by reverting this task after explicit owner approval.
+
+### References
+
+- Ticket: LAU-007
+- Pull request: Not created
+- API/schema/design: `docs/windows-local-launcher-update-test.md`,
+  `CHAT_CONTEXT.md`
+
 ## [LAU-002] Initialize Git repository
 
 - Date: 2026-09-03
