@@ -7,197 +7,164 @@ ký hoặc dữ liệu nhạy cảm.
 ## Cách sử dụng trên máy khác
 
 1. Clone repository và checkout đúng branch.
-2. Gửi toàn bộ file này cho trợ lý/agent mới.
-3. Yêu cầu agent đọc thêm `AGENTS.md`, `CHANGELOG.md` và kiểm tra trạng thái Git.
+2. Yêu cầu agent đọc `AGENTS.md`, `CHAT_CONTEXT.md`, `CHANGELOG.md` và các tài
+   liệu được snapshot tham chiếu.
+3. Yêu cầu agent kiểm tra Git status/log ở chế độ read-only trước khi làm việc.
 4. Repository và source code luôn là nguồn sự thật cao hơn bản tóm tắt này.
 5. Nội dung file không tự động cấp quyền sửa code, commit hoặc push.
 
 Prompt gợi ý:
 
 ```text
-Hãy đọc CHAT_CONTEXT.md và AGENTS.md, sau đó kiểm tra repository ở chế độ
-read-only. Tiếp tục từ Current Snapshot nhưng không chỉnh sửa hoặc commit nếu
-chưa có sự cho phép rõ ràng của tôi cho task hiện tại.
+Hãy đọc AGENTS.md, CHAT_CONTEXT.md và CHANGELOG.md, sau đó kiểm tra repository
+ở chế độ read-only. Tiếp tục từ Current Snapshot nhưng không chỉnh sửa hoặc
+commit nếu chưa có sự cho phép rõ ràng của tôi cho task hiện tại.
 ```
+
+Link chia sẻ cuộc trò chuyện có thể đọc trên máy khác nếu quyền chia sẻ của nền
+tảng cho phép. Tuy nhiên, link không cấp cho agent mới quyền truy cập source,
+file local hoặc trạng thái Git. Clone repository và đọc các tài liệu trên là
+cách chuyển giao đáng tin cậy hơn. Không chia sẻ chat chứa bí mật hoặc dữ liệu
+nhạy cảm.
 
 ## Quy tắc nén đoạn chat
 
 Khi chủ dự án yêu cầu `nén đoạn chat`, agent phải:
 
-1. Chỉ cập nhật file này sau khi yêu cầu đó được xem là quyền sửa cho task nén.
-2. Dùng múi giờ `Asia/Ho_Chi_Minh` và thời gian ISO 8601 có offset `+07:00`.
+1. Chỉ cập nhật file này khi yêu cầu đó cấp quyền sửa cho task nén hiện tại.
+2. Dùng múi giờ `Asia/Ho_Chi_Minh` và ISO 8601 với offset `+07:00`.
 3. Nếu không chỉ định thời điểm, nén tới thời điểm nhận yêu cầu.
-4. Nếu chỉ định ngày hoặc giờ, chỉ tổng hợp thông tin tới mốc đó.
-5. Thay nội dung `Current Snapshot` bằng trạng thái mới nhất.
-6. Chuyển snapshot hiện tại xuống `Snapshot History`; không xóa lịch sử cũ.
-7. Ghi mục tương ứng vào `CHANGELOG.md`.
-8. Đối chiếu Git status/diff và kết quả kiểm tra gần nhất trước khi kết thúc.
-9. Snapshot kế tiếp chỉ tổng hợp phần trao đổi mới bắt đầu sau `Compression
-   Baseline`; không lặp lại toàn bộ hội thoại trước mốc, nhưng vẫn giữ các quyết
-   định còn hiệu lực cần thiết để tiếp tục dự án.
-10. Sau mỗi lần nén thành công, chuyển `Compression Baseline` tới đúng thời điểm
-    của snapshot mới.
-
-Mỗi snapshot phải ghi đủ thời điểm, quyết định kiến trúc, việc đã hoàn thành,
-trạng thái Git, giới hạn, bước tiếp theo và quyền được cấp trong task hiện tại.
+4. Chỉ tổng hợp trao đổi mới sau `Compression Baseline`, đồng thời giữ những
+   quyết định cũ vẫn cần để tiếp tục dự án.
+5. Thay `Current Snapshot`, chuyển snapshot cũ xuống `Snapshot History` và
+   không xóa lịch sử.
+6. Chuyển `Compression Baseline` tới thời điểm snapshot mới hoàn tất.
+7. Thêm đúng một mục task vào `CHANGELOG.md`.
+8. Đối chiếu Git status/log/diff và kết quả kiểm tra gần nhất.
+9. Ghi đủ trạng thái repository, quyết định, việc hoàn thành, giới hạn, bước
+   tiếp theo và quyền được cấp.
 
 ## Compression Baseline
 
-- Baseline ID: `BASELINE-20260907-001`
-- Marked at: `2026-09-07T09:18:19+07:00`
-- Ý nghĩa: Khi chủ dự án yêu cầu nén chat lần tiếp theo, chỉ nén các trao đổi và
-  quyết định phát sinh sau mốc này. Snapshot hiện tại và lịch sử cũ tiếp tục
-  được giữ làm nền tham chiếu.
-- Nội dung tại mốc: Đã bổ sung hướng dẫn test launcher update local từng bước
-  trên Windows tại `docs/windows-local-launcher-update-test.md`.
-- Mốc này không cấp quyền sửa file, chạy lệnh ghi dữ liệu, commit hoặc push cho
-  bất kỳ task tương lai nào.
+- Baseline ID: `BASELINE-20260908-002`
+- Marked at: `2026-09-08T09:24:38+07:00`
+- Snapshot tương ứng: `CTX-20260908-003`.
+- Lần nén tiếp theo bắt đầu với trao đổi phát sinh sau mốc này.
+- Mốc không cấp quyền sửa file, chạy lệnh ghi dữ liệu, commit hoặc push cho task
+  tương lai.
 
 ## Current Snapshot
 
 ### Metadata
 
-- Snapshot ID: `CTX-20260907-002`
-- Compressed at: `2026-09-07T09:02:28+07:00`
-- Conversation scope: Từ khi bắt đầu dự án đến khi hoàn thành launcher updater,
-  hướng dẫn local test và xác định yêu cầu game updater.
+- Snapshot ID: `CTX-20260908-003`
+- Compressed at: `2026-09-08T09:24:38+07:00`
+- Conversation scope: Sau `BASELINE-20260907-001`, gồm việc chuyển tài liệu test
+  Windows vào repository, cách dùng link chia sẻ chat trên máy khác và lần kiểm
+  tra độ đầy đủ của snapshot này.
 - Repository: `https://github.com/minggtienn/ai-agent-launcher.git`
-- Branch: `main`
-- Remote: `origin`
-- HEAD khi bắt đầu snapshot: `6e02978 add updater laucher`
-- Trạng thái Git trước task nén: sạch, `main` đồng bộ `origin/main`.
+- Branch/remote: `main`, `origin`.
+- HEAD: `2bd2bb0 add log, build test update laucher local`.
+- Trạng thái trước task nén: working tree sạch; `main` đồng bộ `origin/main`.
+- Trạng thái sau task nén: `CHAT_CONTEXT.md` và `CHANGELOG.md` đã sửa nhưng
+  chưa commit; không có source code nào thay đổi.
 
-### Product goal and delivery order
+### New context since previous baseline
 
-Xây dựng launcher Windows 10/11 x64 bằng Flutter theo thứ tự bắt buộc:
+- Đã có tài liệu thao tác end-to-end tại
+  `docs/windows-local-launcher-update-test.md`: chuẩn bị Windows/FVM, build hai
+  version, tạo ZIP/manifest, chạy HTTP server, apply, xác minh và test lỗi.
+- Tài liệu nêu rõ Python static server có thể không trả HTTP `206`; kiểm tra
+  resume cần server hỗ trợ Range thực sự.
+- Rollback không-healthy cần artifact fault-injection riêng cố ý không ghi health
+  marker; không thể kích hoạt tin cậy chỉ bằng sửa manifest.
+- Các tài liệu của task `LAU-006` và `LAU-007` đã được người dùng commit/push ở
+  commit `2bd2bb0`, nên máy khác clone `origin/main` có thể đọc được.
+- Link share chat chỉ mang nội dung hội thoại theo quyền truy cập của nền tảng;
+  nó không thay thế repository và không truyền quyền thao tác Git/file local.
 
-1. Kiểm tra và cập nhật launcher trước login.
-2. Hiển thị login sau khi launcher đã ở phiên bản mới nhất.
-3. Hiển thị home kiểu Riot Client: danh sách game ở sidebar trái, vùng nội dung
-   bên phải và mỗi game có danh sách tab riêng do server cấu hình.
-4. Sau login mới kiểm tra/cập nhật game theo từng patch tuần tự.
-5. Khi triển khai game installer/updater, cho người dùng chọn thư mục và ổ cài,
-   lưu cấu hình, kiểm tra dung lượng trống trước tải/giải nén/apply.
+### Product order and architecture still in effect
 
-### Locked architecture
+1. Launcher update bắt buộc chạy trước login.
+2. Sau đó hoàn thiện login.
+3. Home kiểu Riot Client có danh sách game bên trái và tab riêng theo game.
+4. Sau login mới kiểm tra/cập nhật game bằng patch chain tuần tự.
+5. Game installer/updater về sau phải chọn thư mục/ổ đĩa và kiểm tra dung lượng.
 
-- Flutter `3.44.4`, Dart `3.12.2`, FVM `3.1.3`.
-- Feature-first Clean Architecture.
-- BLoC cho session, launcher update, game update và launch; Cubit cho catalog,
-  tab selection và settings.
-- GetIt + Injectable, Dio, Drift, secure storage và custom Material 3.
-- Ba môi trường `dev`, `staging`, `prod` dùng `--dart-define`.
-- `app_links` thay `protocol_handler` vì xung đột `win32_registry`.
-- Không dùng WinSparkle/`auto_updater`; chỉ có một custom ZIP update engine.
+- Windows 10/11 x64; Flutter `3.44.4`, Dart `3.12.2`, FVM `3.1.3`.
+- Feature-first Clean Architecture; BLoC/Cubit; GetIt + Injectable; Dio; Drift;
+  secure storage; custom Material 3.
+- `dev`, `staging`, `prod` cấu hình bằng `--dart-define`.
+- Custom ZIP updater; không dùng `auto_updater`/WinSparkle và không duy trì dự
+  án updater thứ hai.
 
-### Launcher update behavior
+### Implemented launcher update behavior
 
-- Startup route là màn hình updater kiểu Discord kích thước `520x360`.
-- Không có update thì resize sang `1280x720` và mở login.
-- Có update thì launcher phải hoàn tất update trước login.
-- Manifest REST chứa `version`, `mandatory`, `downloadUrl`, `size`, `sha256`,
+- Kiểm tra REST manifest trước login, tải có resume bằng HTTP Range.
+- Kiểm size, SHA-256 và Ed25519; `ALLOW_UNSIGNED_UPDATES=true` chỉ dành local.
+- Giải nén sang staging cùng ổ, không chồng file vào runtime đang chạy.
+- Copy runtime sang `%TEMP%`, chạy `--apply-launcher-update`, đổi thư mục, mở
+  version mới, chờ health marker và rollback nếu không healthy.
+- Manifest gồm `version`, `mandatory`, `downloadUrl`, `size`, `sha256`,
   `signature`, `entryExecutable`, `releaseNotes`.
-- Hỗ trợ HTTP Range resume; server không trả `206` thì tải lại từ đầu.
-- ZIP được kiểm size, SHA-256 và chữ ký Ed25519 rồi giải nén vào staging cùng ổ.
-- Không giải nén chồng trực tiếp lên thư mục đang chạy.
-- Không duy trì app updater thứ hai: launcher copy chính runtime sang `%TEMP%`,
-  chạy executable đó với `--apply-launcher-update`, thoát process chính, đổi
-  thư mục, mở phiên bản mới, chờ health marker và rollback nếu không healthy.
-- Đã gỡ package `auto_updater` và native registrant liên quan.
+- Cấu hình build: `LAUNCHER_UPDATE_MANIFEST_URL`,
+  `LAUNCHER_UPDATE_PUBLIC_KEY`, `ALLOW_UNSIGNED_UPDATES`.
 
-Các biến build:
+### Verification and remaining risks
 
-```text
-LAUNCHER_UPDATE_MANIFEST_URL
-LAUNCHER_UPDATE_PUBLIC_KEY
-ALLOW_UNSIGNED_UPDATES
-```
-
-`ALLOW_UNSIGNED_UPDATES=true` chỉ dành cho local development. Production phải
-ký chuỗi SHA-256 viết thường bằng Ed25519 và chỉ nhúng public key vào launcher.
-
-### Game update decisions
-
-- Game update chỉ bắt đầu sau launcher update và login.
-- Từ version hiện tại đến mới nhất phải áp dụng patch chain theo thứ tự
-  `fromVersion -> toVersion`; patch sau không chạy nếu patch trước thất bại.
-- Mỗi patch có manifest thao tác `add`, `replace`, `move`, `delete`, hash và chữ
-  ký; không giải nén đè toàn bộ game.
-- Nếu chuỗi quá dài, dự kiến tối đa 5 patch hoặc tổng patch lớn hơn 80% full
-  package thì dùng base/full package mới.
-- Download queue thuộc application scope để đổi game/tab không hủy download và
-  có thể lưu/resume bằng Drift.
-- Phần game updater, chọn ổ, kiểm dung lượng và Drift schema chưa được code.
-
-### Completed work
-
-- `LAU-001`: Flutter Windows project, Clean Architecture, dependency, DI,
-  authentication foundation, domain contracts, CI, test và tài liệu quản trị.
-- `LAU-002`: Git branch `main` và remote `origin`.
-- `LAU-003`: Login desktop gồm campaign/news, form, title bar và responsive UI.
-- `LAU-004`: Portable chat context và snapshot protocol.
-- `LAU-005`: Launcher updater gồm REST manifest repository, download/resume,
-  staging, integrity/signature verification, self-copy apply mode, health-check,
-  rollback, startup BLoC/UI và tài liệu local test.
-- Lần kiểm tra gần nhất: Injectable codegen thành công; `flutter analyze` sạch;
-  `flutter test` 8/8 pass; `git diff --check` pass.
-- Commit launcher updater hiện ở `6e02978` và đã đồng bộ `origin/main`.
-
-### Local update test recipe
-
-- Full apply test cần máy Windows; macOS chỉ chạy analyze/unit/widget tests.
-- Dùng thư mục tạm như `C:\launcher-update-test`, không dùng bản cài thật.
-- Build bản mới `1.1.0`, ZIP nội dung bên trong thư mục Release và phục vụ cùng
-  `latest.json` bằng local HTTP server.
-- Tính `size` và SHA-256 thật của ZIP; local có thể để signature rỗng khi build
-  cả bản cũ/mới với `ALLOW_UNSIGNED_UPDATES=true`.
-- Build/copy bản cũ `1.0.0` vào `install\current`, chạy và quan sát download,
-  staging, restart, health marker và backup.
-- Phải test thêm hash sai, ZIP thiếu executable, server 404, download gián đoạn,
-  HTTP Range, không đủ quyền và rollback khi bản mới không healthy.
-
-### Current limitations and risks
-
-- Self-apply/rollback chưa được xác nhận end-to-end bằng artifact ký trên Windows.
-- Thư mục cài đặt phải ghi được; staging và current phải cùng volume.
-- Backup/temp runtime cleanup tự động chưa được hoàn thiện.
-- Login vẫn dùng artwork/logo/news placeholder; chưa có asset gốc.
-- Backend authentication, catalog, update URL và OpenAPI thật chưa được cung cấp.
-- Login footer còn hiển thị version dạng text cố định thay vì `PackageInfo`.
-- Game updater, disk selection/free-space check, Drift schema, tray,
-  single-instance và game process launcher chưa được triển khai production.
+- Kết quả code gần nhất được ghi nhận: Injectable codegen thành công,
+  `flutter analyze` sạch và `flutter test` 8/8 pass.
+- `git diff --check` của task snapshot sẽ được kiểm tra trước khi bàn giao.
+- Self-apply/rollback vẫn chưa được xác nhận end-to-end trên Windows bằng
+  artifact production đã ký.
+- Thư mục cài phải ghi được; staging/current phải cùng volume.
+- Cleanup backup/runtime tạm chưa hoàn thiện.
+- Login còn asset placeholder và footer version tĩnh; backend/OpenAPI chưa có.
+- Game updater, disk selection/free-space, Drift schema, tray, single-instance
+  và game process launcher chưa hoàn thiện production.
 
 ### Next recommended tasks
 
-1. Test launcher updater end-to-end trên Windows bằng local ZIP/manifest.
-2. Sửa các lỗi thực tế phát hiện từ Windows file locking, permission và rollback.
+1. Chạy tài liệu local updater test trên máy Windows và ghi kết quả thực tế.
+2. Sửa lỗi Windows file locking, permission hoặc rollback nếu phát hiện.
 3. Chốt OpenAPI update/auth/catalog và artifact signing pipeline.
-4. Hoàn thiện login API/token refresh và thay asset chính thức.
-5. Thiết kế game installation location + free-space service + Drift schema.
-6. Triển khai patch-chain game updater và home/sidebar/tab UI.
+4. Hoàn thiện login API/token refresh và asset chính thức.
+5. Thiết kế vị trí cài game, kiểm tra dung lượng và Drift schema.
+6. Triển khai patch-chain game updater rồi home/sidebar/tab UI.
 
 ### Authorization state
 
-- Task hiện tại chỉ cho phép cập nhật snapshot và changelog.
-- Không có quyền sửa source, dependency hoặc cấu hình khác.
+- Task hiện tại chỉ cho phép cập nhật `CHAT_CONTEXT.md` và `CHANGELOG.md` để
+  hoàn thiện snapshot.
+- Không có quyền sửa source/dependency/configuration khác.
 - Không có quyền commit, push, merge, tag hoặc release.
-- Task tiếp theo phải nhận quyền sửa mới từ chủ dự án.
+- Quyền của task này không chuyển sang task tiếp theo.
 
 ## Snapshot History
 
+### CTX-20260907-002
+
+- Compressed at: `2026-09-07T09:02:28+07:00`.
+- Scope: Từ khi bắt đầu dự án tới launcher updater, kế hoạch local test và quyết
+  định game patch updater.
+- HEAD: `6e02978 add updater laucher`; working tree khi bắt đầu snapshot sạch và
+  đồng bộ `origin/main`.
+- Recorded: project order, locked architecture, launcher self-update flow,
+  manifest/signing rules, game patch-chain decisions, 8 test pass và các rủi ro.
+- Sau snapshot này, `LAU-007` bổ sung hướng dẫn Windows local test chi tiết và
+  đặt `BASELINE-20260907-001` tại `2026-09-07T09:18:19+07:00`.
+- Authorization: chỉ cập nhật snapshot/changelog; không cấp quyền Git.
+
 ### CTX-20260903-001
 
-- Compressed at: `2026-09-03T15:24:29+07:00`
+- Compressed at: `2026-09-03T15:24:29+07:00`.
 - Repository/branch: `ai-agent-launcher`, `main`, remote `origin`.
 - Goal: Flutter Windows launcher với login REST, catalog, download/update và
   launch process.
-- Locked stack: Flutter `3.44.4`, Dart `3.12.2`, FVM, feature-first Clean
-  Architecture, BLoC/Cubit, GetIt/Injectable, Dio, Drift, secure storage và
-  custom Material 3.
-- Completed: `LAU-001` project foundation, `LAU-002` Git initialization và
-  `LAU-003` desktop login reference UI; analyzer sạch và 5 test pass.
-- Limitations lúc snapshot: chưa có asset gốc, backend contract, production
-  updater, Drift schema hoặc Windows E2E verification.
-- Next tasks lúc snapshot: hoàn thiện asset/login, OpenAPI, token refresh,
-  database và Windows lifecycle.
-- Authorization: snapshot không cấp quyền sửa, commit hoặc push cho task khác.
+- Locked stack: Flutter `3.44.4`, Dart `3.12.2`, FVM, Clean Architecture,
+  BLoC/Cubit, GetIt/Injectable, Dio, Drift và secure storage.
+- Completed: `LAU-001` foundation, `LAU-002` Git và `LAU-003` desktop login;
+  analyzer sạch và 5 test pass.
+- Limitations: chưa có asset gốc, backend contract, production updater, Drift
+  schema hoặc Windows E2E verification.
+- Authorization: snapshot không cấp quyền sửa, commit hoặc push.

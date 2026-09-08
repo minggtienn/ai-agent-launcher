@@ -49,6 +49,53 @@ Architecture, BLoC/Cubit, GetIt/Injectable and REST-oriented contracts.
 - Pull request: Not created
 - API/schema/design: `docs/architecture.md`
 
+## [LAU-008] Complete portable context after compression baseline
+
+- Date: 2026-09-08
+- Author: Codex (requested by project owner)
+- Type: Changed, Documentation
+- Module: project communication, governance
+- Environments: all
+- Breaking change: No
+- Migration/configuration: No
+
+### Purpose
+
+Reconcile the portable snapshot with all discussion and repository state since
+the previous compression baseline.
+
+### Changes
+
+- Added snapshot `CTX-20260908-003` and archived `CTX-20260907-002`.
+- Recorded the committed Windows local updater guide and the limitations of
+  transferring project context through a shared chat link.
+- Advanced the next compression point to `BASELINE-20260908-002`.
+- Updated the recorded HEAD and Git synchronization state.
+
+### Before and after
+
+- Before: Current context still identified commit `6e02978` and did not include
+  the post-baseline chat-sharing clarification.
+- After: Current context identifies commit `2bd2bb0` and covers all discussion
+  through the new baseline.
+
+### Verification
+
+- Compared the snapshot with Git status/log, the Windows test guide and recent
+  conversation decisions.
+- Documentation-only change; no Flutter build or test was run.
+
+### Risks and rollback
+
+- Repository state remains the source of truth if this snapshot becomes stale.
+- Rollback by reverting this task after explicit owner approval.
+
+### References
+
+- Ticket: LAU-008
+- Pull request: Not created
+- API/schema/design: `CHAT_CONTEXT.md`
+
 ## [LAU-006] Refresh portable chat context after launcher updater
 
 - Date: 2026-09-07
