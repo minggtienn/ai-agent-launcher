@@ -8,6 +8,8 @@ import 'package:flutter_test/flutter_test.dart';
 final class _FakeUpdateRepository implements LauncherUpdateRepository {
   _FakeUpdateRepository(this.manifest);
   final LauncherUpdateManifest? manifest;
+  int repairCalls = 0;
+  int downloadCalls = 0;
 
   @override
   Future<Result<LauncherUpdateManifest?>> checkForUpdate() async =>
@@ -16,16 +18,27 @@ final class _FakeUpdateRepository implements LauncherUpdateRepository {
   @override
   Stream<Result<LauncherUpdateProgress>> downloadAndStage(
     LauncherUpdateManifest manifest,
-  ) => const Stream.empty();
+  ) {
+    downloadCalls++;
+    return const Stream.empty();
+  }
 
   @override
   Future<Result<void>> apply(
     LauncherUpdateManifest manifest,
     String stagedDirectory,
   ) async => const Success(null);
+
+  @override
+  Future<Result<void>> repairFailedUpdate() async {
+    repairCalls++;
+    return const Success(null);
+  }
 }
 
 void main() {
+  late _FakeUpdateRepository repairRepository;
+
   test('AppVersion compares semantic numeric parts', () {
     expect(
       const AppVersion('1.10.0').compareTo(const AppVersion('1.9.9')),
@@ -45,9 +58,9 @@ void main() {
   );
 
   blocTest<LauncherUpdateBloc, LauncherUpdateState>(
-    'reports an optional launcher update',
-    build: () => LauncherUpdateBloc(
-      _FakeUpdateRepository(
+    'automatically starts an available launcher update',
+    build: () {
+      final repository = _FakeUpdateRepository(
         LauncherUpdateManifest(
           version: const AppVersion('2.0.0'),
           downloadUrl: Uri.parse('https://example.invalid/launcher.zip'),
@@ -58,12 +71,29 @@ void main() {
           mandatory: false,
           releaseNotes: const [],
         ),
-      ),
-    ),
+      );
+      repairRepository = repository;
+      return LauncherUpdateBloc(repository);
+    },
     act: (bloc) => bloc.add(const LauncherUpdateCheckRequested()),
     expect: () => [
       isA<LauncherUpdateChecking>(),
       isA<LauncherUpdateAvailable>(),
     ],
+    verify: (_) => expect(repairRepository.downloadCalls, 1),
+  );
+
+  blocTest<LauncherUpdateBloc, LauncherUpdateState>(
+    'repairs failed update data and checks again',
+    build: () {
+      repairRepository = _FakeUpdateRepository(null);
+      return LauncherUpdateBloc(repairRepository);
+    },
+    act: (bloc) => bloc.add(const LauncherUpdateRepairRequested()),
+    expect: () => [
+      isA<LauncherUpdateChecking>(),
+      isA<LauncherUpdateNotRequired>(),
+    ],
+    verify: (_) => expect(repairRepository.repairCalls, 1),
   );
 }

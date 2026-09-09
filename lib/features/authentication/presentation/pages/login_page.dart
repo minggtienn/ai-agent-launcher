@@ -5,10 +5,11 @@ import 'package:ai_agent_launcher/features/authentication/presentation/bloc/sess
 import 'package:ai_agent_launcher/features/authentication/presentation/widgets/launcher_brand.dart';
 import 'package:ai_agent_launcher/features/authentication/presentation/widgets/login_hero_panel.dart';
 import 'package:ai_agent_launcher/features/authentication/presentation/widgets/window_controls.dart';
+import 'package:ai_agent_launcher/features/updater/presentation/bloc/launcher_update_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:window_manager/window_manager.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 final class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -21,8 +22,15 @@ final class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _username = TextEditingController();
   final _password = TextEditingController();
+  late final Future<PackageInfo> _packageInfo;
   bool _rememberAccount = false;
   bool _obscurePassword = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _packageInfo = PackageInfo.fromPlatform();
+  }
 
   @override
   void dispose() {
@@ -62,12 +70,7 @@ final class _LoginPageState extends State<LoginPage> {
       color: const Color(0xFF11151E),
       child: Column(
         children: [
-          const DragToMoveArea(
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: WindowControls(),
-            ),
-          ),
+          const LauncherTitleBar(),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
@@ -224,6 +227,19 @@ final class _LoginPageState extends State<LoginPage> {
                             )
                           : const SizedBox.shrink(),
                     ),
+                    if (config.environment == AppEnvironment.development) ...[
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          context.read<LauncherUpdateBloc>().add(
+                            const LauncherUpdateCheckRequested(),
+                          );
+                          context.go(AppRoutes.update);
+                        },
+                        icon: const Icon(Icons.system_update_alt, size: 18),
+                        label: const Text('KIỂM TRA CẬP NHẬT LAUNCHER'),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -233,9 +249,23 @@ final class _LoginPageState extends State<LoginPage> {
             padding: const EdgeInsets.all(10),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text(
-                'Phiên bản: 1.0.0 • ${config.environment.updateChannel}',
-                style: const TextStyle(color: Colors.white30, fontSize: 10),
+              child: FutureBuilder<PackageInfo>(
+                future: _packageInfo,
+                builder: (context, snapshot) {
+                  final packageInfo = snapshot.data;
+                  final version = packageInfo == null
+                      ? '...'
+                      : packageInfo.buildNumber.isEmpty
+                      ? packageInfo.version
+                      : '${packageInfo.version}+${packageInfo.buildNumber}';
+                  return Text(
+                    'Phiên bản: $version • ${config.environment.updateChannel}',
+                    style: const TextStyle(
+                      color: Colors.white30,
+                      fontSize: 10,
+                    ),
+                  );
+                },
               ),
             ),
           ),

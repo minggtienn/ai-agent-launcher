@@ -2,6 +2,81 @@
 
 This append-only log records one entry per task or pull request.
 
+## [LAU-009] Fix updater helper exit and runtime version footer
+
+- Date: 2026-09-08
+- Author: Codex (requested by project owner)
+- Type: Added, Changed, Fixed, Test, Documentation
+- Module: launcher updater, authentication presentation, Windows runner
+- Environments: all, Windows
+- Breaking change: No
+- Migration/configuration: No
+
+### Purpose
+
+Resolve issues found by Windows launcher update testing: the temporary updater
+helper remained alive after a healthy restart, and the login footer displayed
+a hard-coded version.
+
+### Changes
+
+- Added a native completion marker so the Windows runner exits the temporary
+  helper message loop after apply or rollback finishes.
+- Replaced the hard-coded login footer version with runtime package metadata,
+  including the build number when present.
+- Added a development-only manual update entry point and repair action for
+  interrupted downloads or stale staging directories.
+- Added a repository-local update feed template whose generated manifests and
+  large artifacts remain ignored.
+- Kept Flutter binding initialization and `runApp` in the same guarded zone to
+  avoid desktop bootstrap zone mismatch warnings.
+- Reduced the startup updater window, applied a darker background and anchored
+  highlighted window controls to the top-right across updater, login and
+  catalog screens.
+- Removed the native resize frame so the dark content reaches every window
+  edge without an outer black border.
+- Disabled the native window shadow so frameless launcher edges render without
+  the remaining black halo.
+- Changed startup to show only an animated logo for at least 1.5 seconds, enter
+  the launcher silently when current, and show progress only while an available
+  update is downloaded and applied automatically.
+- Reworked the splash so the brand travels horizontally across a transparent
+  window, then the dark background appears for two seconds before login or
+  update progress is shown.
+- Centered the startup brand as two lines (`VTC GAME` and `GAME IS LIFE`) and
+  reveal both lines together from left to right.
+- Removed the Windows resize border through `window_manager` while retaining
+  the standard host window, so custom minimize/close controls keep working.
+- Added widget coverage for the runtime version footer.
+
+### Before and after
+
+- Before: A successful update left the temporary helper running, the footer
+  continued to show version `1.0.0`, and local recovery was manual.
+- After: The native helper exits after completion, the footer reflects the
+  installed executable version, and development builds expose update and
+  repair controls.
+
+### Verification
+
+- Flutter analyzer passed with no issues.
+- All 9 automated tests passed.
+- Windows release builds for versions 1.0.0+1 and 1.1.0+2 passed.
+- Repository-local Windows E2E passed for download, backup, health check,
+  runtime version display and native helper shutdown.
+
+### Risks and rollback
+
+- Rollback fault injection still requires a deliberately unhealthy local
+  artifact; the healthy update path is verified on Windows.
+- Rollback by reverting this task after explicit owner approval.
+
+### References
+
+- Ticket: LAU-009
+- Pull request: Not created
+- API/schema/design: `docs/windows-local-launcher-update-test.md`
+
 ## [LAU-001] Bootstrap Flutter Windows launcher architecture
 
 - Date: 2026-09-03

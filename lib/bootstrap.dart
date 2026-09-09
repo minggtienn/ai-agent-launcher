@@ -12,23 +12,25 @@ Future<void> bootstrap(
   List<String> arguments,
 ) async {
   if (await LauncherUpdateApplier.handleCommandLine(arguments)) return;
-  WidgetsFlutterBinding.ensureInitialized();
   await configureDependencies(environment);
-  await windowManager.ensureInitialized();
-  const windowOptions = WindowOptions(
-    size: Size(520, 360),
-    minimumSize: Size(520, 360),
-    center: true,
-    backgroundColor: Color(0xFF10141D),
-    titleBarStyle: TitleBarStyle.hidden,
-  );
-  await windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.show();
-    await windowManager.focus();
-  });
-  await LauncherUpdateApplier.writeHealthMarker(arguments);
-  runZonedGuarded(
-    () => runApp(const LauncherApp()),
+  await runZonedGuarded<Future<void>>(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
+      await windowManager.ensureInitialized();
+      const windowOptions = WindowOptions(
+        size: Size(440, 300),
+        minimumSize: Size(440, 300),
+        center: true,
+        backgroundColor: Color(0x00000000),
+        titleBarStyle: TitleBarStyle.hidden,
+      );
+      await windowManager.waitUntilReadyToShow(windowOptions, () async {
+        await windowManager.show();
+        await windowManager.focus();
+      });
+      await LauncherUpdateApplier.writeHealthMarker(arguments);
+      runApp(const LauncherApp());
+    },
     appLogger.handle,
-  );
+  )!;
 }

@@ -1,6 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 
+final class LauncherTitleBar extends StatelessWidget {
+  const LauncherTitleBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      height: 36,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: DragToMoveArea(child: SizedBox.expand()),
+          ),
+          Positioned(top: 0, right: 0, child: WindowControls()),
+        ],
+      ),
+    );
+  }
+}
+
 final class WindowControls extends StatelessWidget {
   const WindowControls({super.key});
 
@@ -12,12 +31,17 @@ final class WindowControls extends StatelessWidget {
         _WindowButton(
           icon: Icons.remove,
           tooltip: 'Minimize',
+          backgroundColor: const Color(0xFF1C2634),
+          hoverColor: const Color(0xFF31506F),
+          iconColor: const Color(0xFFB9D9F5),
           onPressed: windowManager.minimize,
         ),
         _WindowButton(
           icon: Icons.close,
           tooltip: 'Close',
-          hoverColor: const Color(0xFFC42B1C),
+          backgroundColor: const Color(0xFF3A2026),
+          hoverColor: const Color(0xFFE5484D),
+          iconColor: const Color(0xFFFFD7D9),
           onPressed: windowManager.close,
         ),
       ],
@@ -30,25 +54,32 @@ final class _WindowButton extends StatelessWidget {
     required this.icon,
     required this.tooltip,
     required this.onPressed,
-    this.hoverColor,
+    required this.backgroundColor,
+    required this.hoverColor,
+    required this.iconColor,
   });
 
   final IconData icon;
   final String tooltip;
   final Future<void> Function() onPressed;
-  final Color? hoverColor;
+  final Color backgroundColor;
+  final Color hoverColor;
+  final Color iconColor;
 
   @override
   Widget build(BuildContext context) {
     return Tooltip(
       message: tooltip,
-      child: InkWell(
-        hoverColor: hoverColor ?? Colors.white10,
-        onTap: onPressed,
-        child: SizedBox(
-          width: 48,
-          height: 36,
-          child: Icon(icon, size: 17, color: Colors.white70),
+      child: Material(
+        color: backgroundColor,
+        child: InkWell(
+          hoverColor: hoverColor,
+          onTap: onPressed,
+          child: SizedBox(
+            width: 46,
+            height: 34,
+            child: Icon(icon, size: 18, color: iconColor),
+          ),
         ),
       ),
     );

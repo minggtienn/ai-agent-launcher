@@ -19,6 +19,10 @@ final class LauncherUpdateStartRequested extends LauncherUpdateEvent {
   const LauncherUpdateStartRequested();
 }
 
+final class LauncherUpdateRepairRequested extends LauncherUpdateEvent {
+  const LauncherUpdateRepairRequested();
+}
+
 sealed class LauncherUpdateState {
   const LauncherUpdateState();
 }
@@ -61,6 +65,7 @@ final class LauncherUpdateBloc
   LauncherUpdateBloc(this._repository) : super(const LauncherUpdateInitial()) {
     on<LauncherUpdateCheckRequested>(_onCheck);
     on<LauncherUpdateStartRequested>(_onStart);
+    on<LauncherUpdateRepairRequested>(_onRepair);
   }
 
   final LauncherUpdateRepository _repository;
@@ -78,7 +83,7 @@ final class LauncherUpdateBloc
               ? const LauncherUpdateNotRequired()
               : LauncherUpdateAvailable(manifest),
         );
-        if (manifest != null && manifest.mandatory) {
+        if (manifest != null) {
           add(const LauncherUpdateStartRequested());
         }
       case FailureResult(:final error):
@@ -115,6 +120,20 @@ final class LauncherUpdateBloc
     switch (applied) {
       case Success():
         emit(const LauncherUpdateRestarting());
+      case FailureResult(:final error):
+        emit(LauncherUpdateFailure(error as Failure));
+    }
+  }
+
+  Future<void> _onRepair(
+    LauncherUpdateRepairRequested event,
+    Emitter<LauncherUpdateState> emit,
+  ) async {
+    emit(const LauncherUpdateChecking());
+    final result = await _repository.repairFailedUpdate();
+    switch (result) {
+      case Success():
+        add(const LauncherUpdateCheckRequested());
       case FailureResult(:final error):
         emit(LauncherUpdateFailure(error as Failure));
     }

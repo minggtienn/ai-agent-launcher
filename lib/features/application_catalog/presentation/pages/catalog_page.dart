@@ -1,5 +1,6 @@
 import 'package:ai_agent_launcher/app/router/app_router.dart';
 import 'package:ai_agent_launcher/features/authentication/presentation/bloc/session_bloc.dart';
+import 'package:ai_agent_launcher/features/authentication/presentation/widgets/window_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -15,6 +16,8 @@ final class CatalogPage extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
+          toolbarHeight: 36,
+          automaticallyImplyLeading: false,
           title: const Text('Applications'),
           actions: [
             IconButton(
@@ -24,6 +27,7 @@ final class CatalogPage extends StatelessWidget {
               ),
               icon: const Icon(Icons.logout),
             ),
+            const WindowControls(),
           ],
         ),
         body: const Center(

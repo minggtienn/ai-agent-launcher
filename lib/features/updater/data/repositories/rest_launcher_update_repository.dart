@@ -249,4 +249,37 @@ final class RestLauncherUpdateRepository implements LauncherUpdateRepository {
     LauncherUpdateManifest manifest,
     String stagedDirectory,
   ) => _applier.apply(manifest: manifest, stagedDirectory: stagedDirectory);
+
+  @override
+  Future<Result<void>> repairFailedUpdate() async {
+    try {
+      final installDirectory = File(Platform.resolvedExecutable).parent;
+      final parent = installDirectory.parent;
+      final workDirectory = Directory(
+        path.join(parent.path, '.launcher-update'),
+      );
+      if (await workDirectory.exists()) {
+        await for (final entity in workDirectory.list()) {
+          if (entity is File && entity.path.endsWith('.zip.part')) {
+            await entity.delete();
+          }
+        }
+      }
+      await for (final entity in parent.list()) {
+        if (entity is Directory &&
+            path.basename(entity.path).startsWith('.launcher-staging-')) {
+          await entity.delete(recursive: true);
+        }
+      }
+      return const Success(null);
+    } on Object catch (error) {
+      return FailureResult(
+        Failure(
+          FailureType.system,
+          'Không thể sửa dữ liệu cập nhật',
+          code: '$error',
+        ),
+      );
+    }
+  }
 }

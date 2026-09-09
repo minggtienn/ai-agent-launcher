@@ -1,0 +1,10 @@
+{
+  "version": "1.1.0",
+  "mandatory": false,
+  "downloadUrl": "http://127.0.0.1:8080/artifacts/launcher-1.1.0.zip",
+  "size": 0,
+  "sha256": "replace-with-lowercase-sha256",
+  "signature": "",
+  "entryExecutable": "ai_agent_launcher.exe",
+  "releaseNotes": ["Local manual update test"]
+}

@@ -1,0 +1,5 @@
+artifacts/*
+!artifacts/.gitkeep
+latest.json
+*.log
+test_install*/

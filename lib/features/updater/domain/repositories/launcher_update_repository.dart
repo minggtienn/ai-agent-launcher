@@ -12,4 +12,6 @@ abstract interface class LauncherUpdateRepository {
     LauncherUpdateManifest manifest,
     String stagedDirectory,
   );
+
+  Future<Result<void>> repairFailedUpdate();
 }

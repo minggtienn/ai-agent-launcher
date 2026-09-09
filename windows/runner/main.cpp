@@ -1,6 +1,9 @@
 #include <flutter/dart_project.h>
 #include <flutter/flutter_view_controller.h>
+#include <shellapi.h>
 #include <windows.h>
+
+#include <string>
 
 #include "flutter_window.h"
 #include "utils.h"
@@ -22,20 +25,51 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   std::vector<std::string> command_line_arguments =
       GetCommandLineArguments();
 
+  std::wstring helper_exit_path;
+  int argument_count = 0;
+  wchar_t** arguments =
+      ::CommandLineToArgvW(::GetCommandLineW(), &argument_count);
+  if (arguments != nullptr) {
+    const std::wstring prefix = L"--helper-exit=";
+    for (int index = 1; index < argument_count; index++) {
+      const std::wstring argument(arguments[index]);
+      if (argument.rfind(prefix, 0) == 0) {
+        helper_exit_path = argument.substr(prefix.size());
+        break;
+      }
+    }
+    ::LocalFree(arguments);
+  }
+
   project.set_dart_entrypoint_arguments(std::move(command_line_arguments));
 
   FlutterWindow window(project);
   Win32Window::Point origin(10, 10);
-  Win32Window::Size size(1280, 720);
+  Win32Window::Size size(440, 300);
   if (!window.Create(L"ai_agent_launcher", origin, size)) {
     return EXIT_FAILURE;
   }
   window.SetQuitOnClose(true);
 
   ::MSG msg;
-  while (::GetMessage(&msg, nullptr, 0, 0)) {
-    ::TranslateMessage(&msg);
-    ::DispatchMessage(&msg);
+  bool running = true;
+  while (running) {
+    while (::PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+      if (msg.message == WM_QUIT) {
+        running = false;
+        break;
+      }
+      ::TranslateMessage(&msg);
+      ::DispatchMessage(&msg);
+    }
+    if (!running) {
+      break;
+    }
+    if (!helper_exit_path.empty() &&
+        ::GetFileAttributesW(helper_exit_path.c_str()) != INVALID_FILE_ATTRIBUTES) {
+      break;
+    }
+    ::MsgWaitForMultipleObjects(0, nullptr, FALSE, 100, QS_ALLINPUT);
   }
 
   ::CoUninitialize();

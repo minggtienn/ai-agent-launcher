@@ -8,9 +8,13 @@ import 'package:ai_agent_launcher/features/authentication/domain/usecases/sign_i
 import 'package:ai_agent_launcher/features/authentication/domain/usecases/sign_out.dart';
 import 'package:ai_agent_launcher/features/authentication/presentation/bloc/session_bloc.dart';
 import 'package:ai_agent_launcher/features/authentication/presentation/pages/login_page.dart';
+import 'package:ai_agent_launcher/features/updater/domain/entities/launcher_update.dart';
+import 'package:ai_agent_launcher/features/updater/domain/repositories/launcher_update_repository.dart';
+import 'package:ai_agent_launcher/features/updater/presentation/bloc/launcher_update_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 final class _FakeAuthRepository implements AuthRepository {
   @override
@@ -26,8 +30,35 @@ final class _FakeAuthRepository implements AuthRepository {
   Future<Result<void>> signOut() async => const Success(null);
 }
 
+final class _FakeUpdateRepository implements LauncherUpdateRepository {
+  @override
+  Future<Result<void>> apply(
+    LauncherUpdateManifest manifest,
+    String stagedDirectory,
+  ) async => const Success(null);
+
+  @override
+  Future<Result<LauncherUpdateManifest?>> checkForUpdate() async =>
+      const Success(null);
+
+  @override
+  Stream<Result<LauncherUpdateProgress>> downloadAndStage(
+    LauncherUpdateManifest manifest,
+  ) => const Stream.empty();
+
+  @override
+  Future<Result<void>> repairFailedUpdate() async => const Success(null);
+}
+
 void main() {
   setUp(() async {
+    PackageInfo.setMockInitialValues(
+      appName: 'AI Agent Launcher',
+      packageName: 'ai_agent_launcher',
+      version: '1.2.3',
+      buildNumber: '4',
+      buildSignature: '',
+    );
     await serviceLocator.reset();
     serviceLocator.registerSingleton<AppConfig>(
       const AppConfig(
@@ -52,19 +83,29 @@ void main() {
     final repository = _FakeAuthRepository();
 
     await tester.pumpWidget(
-      BlocProvider(
-        create: (_) => SessionBloc(
-          SignIn(repository),
-          RestoreSession(repository),
-          SignOut(repository),
-        ),
+      MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => SessionBloc(
+              SignIn(repository),
+              RestoreSession(repository),
+              SignOut(repository),
+            ),
+          ),
+          BlocProvider(
+            create: (_) => LauncherUpdateBloc(_FakeUpdateRepository()),
+          ),
+        ],
         child: const MaterialApp(home: LoginPage()),
       ),
     );
+    await tester.pump();
 
     expect(find.text('CHIẾN DỊCH\nTHẦN LONG'), findsOneWidget);
     expect(find.text('ĐĂNG NHẬP'), findsNWidgets(2));
     expect(find.text('ĐĂNG KÝ'), findsOneWidget);
+    expect(find.text('KIỂM TRA CẬP NHẬT LAUNCHER'), findsOneWidget);
+    expect(find.text('Phiên bản: 1.2.3+4 • dev'), findsOneWidget);
 
     await tester.enterText(find.byKey(const Key('usernameField')), 'leader');
     await tester.enterText(find.byKey(const Key('passwordField')), '123');

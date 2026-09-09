@@ -37,6 +37,10 @@ final class LauncherUpdateApplier {
         Directory.systemTemp.path,
         'launcher-health-${manifest.version.value}-${DateTime.now().millisecondsSinceEpoch}',
       );
+      final helperExitMarker = path.join(
+        Directory.systemTemp.path,
+        'launcher-helper-exit-${DateTime.now().millisecondsSinceEpoch}',
+      );
       await Process.start(
         helperExecutable,
         [
@@ -45,6 +49,7 @@ final class LauncherUpdateApplier {
           '--staged=$stagedDirectory',
           '--entry=${manifest.entryExecutable}',
           '--health=$healthMarker',
+          '--helper-exit=$helperExitMarker',
         ],
         workingDirectory: runtime.path,
         mode: ProcessStartMode.detached,
@@ -79,7 +84,9 @@ final class LauncherUpdateApplier {
     final staged = Directory(values['staged'] ?? '');
     final entry = values['entry'] ?? 'ai_agent_launcher.exe';
     final health = File(values['health'] ?? '');
+    final helperExit = File(values['helper-exit'] ?? '');
     if (!await staged.exists() || source.path.isEmpty) {
+      await _signalHelperExit(helperExit);
       return true;
     }
 
@@ -94,9 +101,11 @@ final class LauncherUpdateApplier {
         path.join(source.path, entry),
         ['--update-health=${health.path}'],
         workingDirectory: source.path,
+        mode: ProcessStartMode.detached,
       );
       for (var attempt = 0; attempt < 60; attempt++) {
         if (await health.exists()) {
+          await _signalHelperExit(helperExit);
           return true;
         }
         await Future<void>.delayed(const Duration(milliseconds: 500));
@@ -118,6 +127,7 @@ final class LauncherUpdateApplier {
         await _renameWithRetry(backup, source);
       }
     }
+    await _signalHelperExit(helperExit);
     return true;
   }
 
@@ -161,5 +171,10 @@ final class LauncherUpdateApplier {
         await entity.copy(destination);
       }
     }
+  }
+
+  static Future<void> _signalHelperExit(File marker) async {
+    if (marker.path.isEmpty) return;
+    await marker.writeAsString('done', flush: true);
   }
 }
