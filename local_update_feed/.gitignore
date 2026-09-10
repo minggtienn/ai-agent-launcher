@@ -2,4 +2,5 @@ artifacts/*
 !artifacts/.gitkeep
 latest.json
 *.log
+.server.pid
 test_install*/

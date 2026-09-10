@@ -2,6 +2,35 @@
 
 Nhật ký chỉ được nối thêm này ghi đúng một entry cho mỗi task hoặc pull request.
 
+## [LAU-010] Tự động hóa kiểm thử updater local
+
+- Ngày: 2026-09-10
+- Tác giả: Codex, theo yêu cầu của chủ dự án
+- Loại: Thêm mới, tài liệu, kiểm thử
+- Module: Công cụ kiểm thử launcher updater
+- Môi trường: Development, Windows local
+- Thay đổi phá vỡ tương thích: Không
+
+### Mục đích và thay đổi
+
+- Thêm script PowerShell hỗ trợ quy trình `Quick` tự động toàn bộ.
+- Thêm quy trình hai giai đoạn: mở đầy đủ bản cũ với manifest cùng version, đóng
+  launcher, công bố update mới rồi mở lại để thực hiện update.
+- Thêm các action `PrepareOld`, `PublishUpdate`, `RunUpdate`, `Verify` và
+  `StopServer`.
+- Thêm tài liệu tiếng Việt riêng với lệnh, kết quả mong đợi và cách xử lý lỗi.
+- Bỏ qua PID server local do script tạo.
+
+### Xác minh
+
+- PowerShell parser, analyzer/test repository và bài smoke test của script.
+
+### Rủi ro và rollback
+
+- `ALLOW_UNSIGNED_UPDATES=true` chỉ dành cho môi trường local được kiểm soát.
+- `-ForceArtifact` có thể thay đúng artifact trùng version; mặc định script từ
+  chối ghi đè.
+
 ## [LAU-009] Hoàn thiện updater Windows và giao diện cửa sổ
 
 - Ngày: 2026-09-08

@@ -36,5 +36,6 @@ bản build development trong môi trường kiểm soát.
 - [Kiến trúc](docs/architecture.md)
 - [Quản trị dự án](docs/governance.md)
 - [Kiểm thử launcher updater trên Windows](docs/windows-local-launcher-update-test.md)
+- [Quy trình kiểm thử updater nhanh](docs/quy-trinh-test-updater-nhanh.md)
 - [Nguồn update local và fixture cố định](local_update_feed/README.md)
 - [Lịch sử thay đổi](CHANGELOG.md)
