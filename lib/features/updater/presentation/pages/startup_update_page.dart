@@ -4,10 +4,10 @@ import 'package:ai_agent_launcher/app/router/app_router.dart';
 import 'package:ai_agent_launcher/features/authentication/presentation/widgets/window_controls.dart';
 import 'package:ai_agent_launcher/features/updater/domain/entities/launcher_update.dart';
 import 'package:ai_agent_launcher/features/updater/presentation/bloc/launcher_update_bloc.dart';
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:window_manager/window_manager.dart';
 
 final class StartupUpdatePage extends StatefulWidget {
   const StartupUpdatePage({super.key});
@@ -32,7 +32,6 @@ final class _StartupUpdatePageState extends State<StartupUpdatePage> {
   Future<void> _runIntro() async {
     await Future<void>.delayed(logoTravelDuration);
     if (!mounted) return;
-    await windowManager.setBackgroundColor(const Color(0xFF090D14));
     setState(() => _backgroundVisible = true);
     await Future<void>.delayed(backgroundHoldDuration);
     if (!mounted) return;
@@ -85,10 +84,20 @@ final class _StartupUpdatePageState extends State<StartupUpdatePage> {
   Future<void> _openLoginOnce() async {
     if (_openingLogin) return;
     _openingLogin = true;
-    await windowManager.setMinimumSize(const Size(980, 620));
-    await windowManager.setSize(const Size(1280, 720), animate: true);
-    await windowManager.center();
-    if (mounted) context.go(AppRoutes.login);
+    appWindow.hide();
+    try {
+      appWindow
+        ..alignment = null
+        ..minSize = const Size(980, 620)
+        ..size = const Size(1280, 720)
+        ..alignment = Alignment.center;
+      if (!mounted) return;
+      context.go(AppRoutes.login);
+      await WidgetsBinding.instance.endOfFrame;
+      appWindow.alignment = Alignment.center;
+    } finally {
+      appWindow.show();
+    }
   }
 }
 

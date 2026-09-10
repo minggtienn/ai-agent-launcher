@@ -1,437 +1,198 @@
-# Engineering Change Log
+# Nhật ký thay đổi kỹ thuật
 
-This append-only log records one entry per task or pull request.
+Nhật ký chỉ được nối thêm này ghi đúng một entry cho mỗi task hoặc pull request.
 
-## [LAU-009] Fix updater helper exit and runtime version footer
+## [LAU-009] Hoàn thiện updater Windows và giao diện cửa sổ
 
-- Date: 2026-09-08
-- Author: Codex (requested by project owner)
-- Type: Added, Changed, Fixed, Test, Documentation
-- Module: launcher updater, authentication presentation, Windows runner
-- Environments: all, Windows
-- Breaking change: No
-- Migration/configuration: No
+- Ngày: 2026-09-08
+- Tác giả: Codex, theo yêu cầu của chủ dự án
+- Loại: Thêm mới, thay đổi, sửa lỗi, kiểm thử, tài liệu
+- Module: launcher updater, xác thực, Windows runner
+- Môi trường: Tất cả, Windows
+- Thay đổi phá vỡ tương thích: Không
+- Migration/cấu hình: Thay `window_manager` bằng `bitsdojo_window`
 
-### Purpose
+### Mục đích
 
-Resolve issues found by Windows launcher update testing: the temporary updater
-helper remained alive after a healthy restart, and the login footer displayed
-a hard-coded version.
+Hoàn thiện luồng tự cập nhật trên Windows, hiển thị đúng version runtime, bổ
+sung khả năng sửa dữ liệu update, cải thiện startup và loại bỏ lỗi khung cửa sổ.
 
-### Changes
+### Thay đổi
 
-- Added a native completion marker so the Windows runner exits the temporary
-  helper message loop after apply or rollback finishes.
-- Replaced the hard-coded login footer version with runtime package metadata,
-  including the build number when present.
-- Added a development-only manual update entry point and repair action for
-  interrupted downloads or stale staging directories.
-- Added a repository-local update feed template whose generated manifests and
-  large artifacts remain ignored.
-- Kept Flutter binding initialization and `runApp` in the same guarded zone to
-  avoid desktop bootstrap zone mismatch warnings.
-- Reduced the startup updater window, applied a darker background and anchored
-  highlighted window controls to the top-right across updater, login and
-  catalog screens.
-- Removed the native resize frame so the dark content reaches every window
-  edge without an outer black border.
-- Disabled the native window shadow so frameless launcher edges render without
-  the remaining black halo.
-- Changed startup to show only an animated logo for at least 1.5 seconds, enter
-  the launcher silently when current, and show progress only while an available
-  update is downloaded and applied automatically.
-- Reworked the splash so the brand travels horizontally across a transparent
-  window, then the dark background appears for two seconds before login or
-  update progress is shown.
-- Centered the startup brand as two lines (`VTC GAME` and `GAME IS LIFE`) and
-  reveal both lines together from left to right.
-- Removed the Windows resize border through `window_manager` while retaining
-  the standard host window, so custom minimize/close controls keep working.
-- Added widget coverage for the runtime version footer.
+- Thêm completion marker để helper tạm thoát sau apply hoặc rollback.
+- Footer đăng nhập đọc version và build number từ `PackageInfo`.
+- Thêm thao tác kiểm tra update development và sửa download/staging bị lỗi.
+- Thêm nguồn update local, artifact và fixture kiểm thử bị Git bỏ qua.
+- Đặt Flutter binding và `runApp` trong cùng guarded zone.
+- Startup chỉ hiện tiến trình khi có update; nếu đã mới nhất thì tự vào login.
+- Brand startup có hai dòng ở giữa và reveal đồng thời từ trái sang phải.
+- Dùng `bitsdojo_window` cho custom frame, kích thước, vị trí, kéo cửa sổ,
+  minimize và close; không còn workaround trong `win32_window.cpp`.
+- Ẩn cửa sổ khi chuyển route/kích thước, sau đó căn giữa và hiện frame login.
+- Giữ fixture `window_manager` 1.1.0+2 và ZIP khôi phục chỉ đọc có SHA-256.
+- Xác minh E2E update từ 1.1.0+2 lên `bitsdojo_window` 1.2.0+3, gồm download,
+  hash, staging, backup, health marker, DLL cũ được loại bỏ và helper tự thoát.
+- Việt hóa toàn bộ tài liệu Markdown và bổ sung hướng dẫn test updater chi tiết.
 
-### Before and after
+### Xác minh
 
-- Before: A successful update left the temporary helper running, the footer
-  continued to show version `1.0.0`, and local recovery was manual.
-- After: The native helper exits after completion, the footer reflects the
-  installed executable version, and development builds expose update and
-  repair controls.
+- `fvm flutter analyze`: không có lỗi.
+- `fvm flutter test`: 9/9 test thành công.
+- `git diff --check`: thành công.
+- Build Windows Debug và Release thành công.
+- E2E Windows local thành công; backup cũ khớp hash fixture.
 
-### Verification
+### Rủi ro và rollback
 
-- Flutter analyzer passed with no issues.
-- All 9 automated tests passed.
-- Windows release builds for versions 1.0.0+1 and 1.1.0+2 passed.
-- Repository-local Windows E2E passed for download, backup, health check,
-  runtime version display and native helper shutdown.
+- Test rollback không healthy cần artifact fault-injection riêng.
+- Chỉ hoàn tác task sau khi chủ dự án cho phép rõ ràng.
 
-### Risks and rollback
-
-- Rollback fault injection still requires a deliberately unhealthy local
-  artifact; the healthy update path is verified on Windows.
-- Rollback by reverting this task after explicit owner approval.
-
-### References
+### Tham chiếu
 
 - Ticket: LAU-009
-- Pull request: Not created
-- API/schema/design: `docs/windows-local-launcher-update-test.md`
+- Pull request: Chưa tạo
+- Thiết kế: `docs/windows-local-launcher-update-test.md`
+- Fixture: `local_update_feed/README.md`
 
-## [LAU-001] Bootstrap Flutter Windows launcher architecture
+## [LAU-008] Hoàn thiện ngữ cảnh chuyển giao sau mốc nén
 
-- Date: 2026-09-03
-- Author: Codex (requested by project owner)
-- Type: Added, Changed, Dependency, Documentation
-- Module: project foundation, application shell, governance
-- Environments: all
-- Breaking change: No
-- Migration/configuration: Pin Flutter 3.44.4 with FVM
+- Ngày: 2026-09-08
+- Loại: Thay đổi, tài liệu
+- Module: Giao tiếp dự án, quản trị
 
-### Purpose
+### Mục đích và thay đổi
 
-Create the initial Windows launcher foundation using feature-first Clean
-Architecture, BLoC/Cubit, GetIt/Injectable and REST-oriented contracts.
+- Đồng bộ snapshot chuyển giao với trao đổi và trạng thái repository mới nhất.
+- Thêm `CTX-20260908-003`, lưu `CTX-20260907-002` vào lịch sử và chuyển mốc
+  nén sang `BASELINE-20260908-002`.
+- Ghi nhận tài liệu test updater Windows và giới hạn của link chia sẻ chat.
 
-### Changes
+### Xác minh và rủi ro
 
-- Created the Flutter Windows project and pinned its SDK.
-- Added the approved runtime, Windows and development dependency groups.
-- Added application configuration, core contracts and feature boundaries.
-- Replaced `protocol_handler` with `app_links` because its Windows registry
-  dependency conflicts with `launch_at_startup`.
-- Added architecture and governance documentation.
+- Đối chiếu Git status/log, tài liệu test và các quyết định gần nhất.
+- Chỉ thay đổi tài liệu; repository luôn là nguồn sự thật nếu snapshot cũ.
 
-### Before and after
+## [LAU-007] Tài liệu hóa kiểm thử launcher update local trên Windows
 
-- Before: Empty workspace.
-- After: Flutter Windows foundation ready for feature delivery.
+- Ngày: 2026-09-07
+- Loại: Thêm mới, thay đổi, tài liệu
+- Module: Launcher updater, giao tiếp dự án
 
-### Verification
+### Mục đích và thay đổi
 
-- `fvm flutter analyze`: passed with no issues.
-- `fvm flutter test`: passed, 4 tests.
-- Injectable code generation: completed successfully.
-- Windows release build: pending a Windows runner; the current host is macOS.
+- Thêm quy trình Windows từng bước cho build hai version, đóng gói ZIP, tạo
+  manifest, chạy HTTP local, apply, xác minh và các tình huống lỗi.
+- Ghi rõ giới hạn HTTP Range và yêu cầu artifact riêng để test rollback.
+- Thêm `BASELINE-20260907-001` cho lần nén hội thoại tiếp theo.
 
-### Risks and rollback
+### Xác minh và rủi ro
 
-- Native Windows behavior still requires verification on a Windows runner.
-- Rollback by reverting this task after explicit owner approval.
+- Đối chiếu lệnh, field manifest và cấu trúc thư mục với implementation updater.
+- Tại thời điểm task, hành vi Windows thực tế vẫn cần chạy trên máy Windows.
 
-### References
+## [LAU-006] Cập nhật ngữ cảnh chuyển giao sau launcher updater
 
-- Ticket: LAU-001
-- Pull request: Not created
-- API/schema/design: `docs/architecture.md`
+- Ngày: 2026-09-07
+- Loại: Thay đổi, tài liệu
+- Module: Giao tiếp dự án, quản trị
 
-## [LAU-008] Complete portable context after compression baseline
+### Mục đích và thay đổi
 
-- Date: 2026-09-08
-- Author: Codex (requested by project owner)
-- Type: Changed, Documentation
-- Module: project communication, governance
-- Environments: all
-- Breaking change: No
-- Migration/configuration: No
+- Thay snapshot hiện tại bằng `CTX-20260907-002` và lưu snapshot cũ vào lịch sử.
+- Ghi lại self-update, quy trình test Windows, quyết định game patch, giới hạn
+  hiện tại và các task tiếp theo.
 
-### Purpose
+### Xác minh và rủi ro
 
-Reconcile the portable snapshot with all discussion and repository state since
-the previous compression baseline.
+- Đối chiếu snapshot với Git status/log và kết quả analyzer/test gần nhất.
+- Repository luôn là nguồn sự thật nếu snapshot trở nên cũ.
 
-### Changes
+## [LAU-005] Xây dựng nền tảng tự cập nhật launcher
 
-- Added snapshot `CTX-20260908-003` and archived `CTX-20260907-002`.
-- Recorded the committed Windows local updater guide and the limitations of
-  transferring project context through a shared chat link.
-- Advanced the next compression point to `BASELINE-20260908-002`.
-- Updated the recorded HEAD and Git synchronization state.
+- Ngày: 2026-09-04
+- Loại: Thêm mới, thay đổi, bảo mật
+- Module: Launcher updater, startup routing, vòng đời Windows
+- Cấu hình: Manifest URL và public key Ed25519
 
-### Before and after
+### Mục đích và thay đổi
 
-- Before: Current context still identified commit `6e02978` and did not include
-  the post-baseline chat-sharing clarification.
-- After: Current context identifies commit `2bd2bb0` and covers all discussion
-  through the new baseline.
+- Kiểm tra update trước login với giao diện tiến trình gọn.
+- Tải ZIP có resume, kiểm size, SHA-256 và chữ ký rồi giải nén staging an toàn.
+- Copy runtime sang `%TEMP%`, apply bằng helper, health check và rollback.
+- Bổ sung cấu hình, test và tài liệu release; game updater để task sau.
 
-### Verification
+### Xác minh và rủi ro
 
-- Compared the snapshot with Git status/log, the Windows test guide and recent
-  conversation decisions.
-- Documentation-only change; no Flutter build or test was run.
+- Injectable codegen thành công; analyzer sạch; 8 test thành công.
+- Thư mục cài phải ghi được và staging phải ở cùng volume.
+- Apply/rollback production cần artifact đã ký và kiểm thử Windows.
 
-### Risks and rollback
+## [LAU-004] Thêm ngữ cảnh hội thoại có thể chuyển giao
 
-- Repository state remains the source of truth if this snapshot becomes stale.
-- Rollback by reverting this task after explicit owner approval.
+- Ngày: 2026-09-03
+- Loại: Thêm mới, tài liệu
+- Module: Giao tiếp dự án, quản trị
 
-### References
+### Mục đích và thay đổi
 
-- Ticket: LAU-008
-- Pull request: Not created
-- API/schema/design: `CHAT_CONTEXT.md`
+- Thêm `CHAT_CONTEXT.md` để chuyển trạng thái dự án giữa máy và hội thoại.
+- Định nghĩa quy trình snapshot và giữ ranh giới quyền hạn; snapshot không tự
+  cấp quyền sửa file hoặc thao tác Git cho agent khác.
 
-## [LAU-006] Refresh portable chat context after launcher updater
+### Xác minh và rủi ro
 
-- Date: 2026-09-07
-- Author: Codex (requested by project owner)
-- Type: Changed, Documentation
-- Module: project communication, governance
-- Environments: all
-- Breaking change: No
-- Migration/configuration: No
+- Đối chiếu snapshot với `AGENTS.md`, changelog và trạng thái Git.
+- Snapshot có thể cũ; repository luôn là nguồn sự thật.
 
-### Purpose
+## [LAU-003] Triển khai màn hình đăng nhập desktop
 
-Transfer the latest launcher updater decisions, implementation state and game
-updater roadmap to another machine or chat platform.
+- Ngày: 2026-09-03
+- Loại: Thêm mới, thay đổi
+- Module: Giao diện xác thực, cửa sổ desktop
 
-### Changes
+### Mục đích và thay đổi
 
-- Replaced the current portable snapshot with `CTX-20260907-002`.
-- Archived the previous `CTX-20260903-001` snapshot.
-- Added the implemented self-update flow, local Windows test recipe, game patch
-  decisions, current limitations and next tasks.
+- Thêm bố cục responsive gồm campaign, tin tức và đăng nhập.
+- Thêm validation, ẩn/hiện mật khẩu, thao tác phụ, title bar và window controls.
+- Giữ artwork dưới dạng widget có thể thay thế khi nhận asset chính thức.
 
-### Before and after
+### Xác minh và rủi ro
 
-- Before: Portable context stopped before launcher updater implementation.
-- After: Portable context matches commit `6e02978` and the latest discussion.
+- Analyzer sạch; test bố cục login 1280x720 thành công.
+- Độ chính xác hình ảnh cuối phụ thuộc asset banner, logo và tin tức gốc.
 
-### Verification
+## [LAU-002] Khởi tạo Git repository
 
-- Compared the snapshot with Git status/log, `CHANGELOG.md` and the latest
-  recorded analyzer/test results.
+- Ngày: 2026-09-03
+- Loại: Thay đổi
+- Module: Cấu hình repository
 
-### Risks and rollback
+### Mục đích và thay đổi
 
-- Repository state remains the source of truth if the snapshot becomes stale.
-- Rollback by reverting this task after explicit owner approval.
+- Khởi tạo Git với branch mặc định `main`.
+- Thêm `https://github.com/minggtienn/ai-agent-launcher.git` làm `origin`.
 
-### References
+### Xác minh và rủi ro
 
-- Ticket: LAU-006
-- Pull request: Not created
-- API/schema/design: `CHAT_CONTEXT.md`
+- `git remote -v` và `git status` trả đúng cấu hình mong đợi.
+- Không commit hoặc push source trong task này.
 
-## [LAU-007] Document Windows local launcher update test
+## [LAU-001] Khởi tạo kiến trúc Flutter Windows launcher
 
-- Date: 2026-09-07
-- Author: Codex (requested by project owner)
-- Type: Added, Changed, Documentation
-- Module: launcher updater, project communication
-- Environments: development, Windows local
-- Breaking change: No
-- Migration/configuration: No
+- Ngày: 2026-09-03
+- Loại: Thêm mới, thay đổi, dependency, tài liệu
+- Module: Nền tảng dự án, application shell, quản trị
+- Cấu hình: Cố định Flutter `3.44.4` bằng FVM
 
-### Purpose
+### Mục đích và thay đổi
 
-Provide a reproducible, step-by-step Windows procedure for validating the
-launcher self-update flow locally and mark where future chat compression starts.
+- Tạo nền tảng Flutter Windows theo Clean Architecture tổ chức theo tính năng,
+  BLoC/Cubit, GetIt/Injectable và contract hướng REST.
+- Thêm cấu hình ứng dụng, core contracts và ranh giới tính năng.
+- Thay `protocol_handler` bằng `app_links` do xung đột dependency registry.
+- Thêm tài liệu kiến trúc và quản trị.
 
-### Changes
+### Xác minh và rủi ro
 
-- Added a Windows local test guide covering two-version builds, ZIP packaging,
-  manifest generation, local HTTP hosting, apply verification and failure cases.
-- Documented the current limitation around rollback fault injection and HTTP
-  Range support in local static servers.
-- Added `BASELINE-20260907-001` so the next requested chat snapshot starts with
-  discussion after this point.
-
-### Before and after
-
-- Before: Local updater testing existed only as a short recipe in chat context.
-- After: Windows testers have an executable checklist and future snapshots have
-  an explicit conversation baseline.
-
-### Verification
-
-- Cross-checked commands, manifest fields and expected folders against the
-  current updater implementation.
-- Documentation-only change; no Flutter build or test was run.
-
-### Risks and rollback
-
-- Exact Windows behavior still requires execution on a Windows machine.
-- Rollback by reverting this task after explicit owner approval.
-
-### References
-
-- Ticket: LAU-007
-- Pull request: Not created
-- API/schema/design: `docs/windows-local-launcher-update-test.md`,
-  `CHAT_CONTEXT.md`
-
-## [LAU-002] Initialize Git repository
-
-- Date: 2026-09-03
-- Author: Codex (requested by project owner)
-- Type: Changed
-- Module: repository configuration
-- Environments: all
-- Breaking change: No
-- Migration/configuration: Added the GitHub repository as `origin`
-
-### Purpose
-
-Connect the local project to its approved GitHub repository.
-
-### Changes
-
-- Initialized an empty Git repository with `main` as the default branch.
-- Added `https://github.com/minggtienn/ai-agent-launcher.git` as `origin`.
-
-### Before and after
-
-- Before: The project directory was not a Git repository.
-- After: Local Git metadata and the `origin` remote are configured.
-
-### Verification
-
-- `git remote -v` reports the expected fetch and push URLs.
-- `git status` reports an uncommitted `main` branch.
-
-### Risks and rollback
-
-- No source files were committed or pushed.
-- Removing Git metadata requires separate explicit owner authorization.
-
-### References
-
-- Ticket: LAU-002
-- Pull request: Not created
-- API/schema/design: Not applicable
-
-## [LAU-003] Implement desktop launcher login screen
-
-- Date: 2026-09-03
-- Author: Codex (requested by project owner)
-- Type: Added, Changed
-- Module: authentication presentation, desktop window
-- Environments: all
-- Breaking change: No
-- Migration/configuration: No
-
-### Purpose
-
-Implement the first desktop screen based on the approved launcher reference.
-
-### Changes
-
-- Added a responsive campaign, news and login split layout.
-- Added branded login controls, validation, password visibility and secondary actions.
-- Added a hidden desktop title bar, drag area, window controls and initial size.
-- Kept campaign artwork behind a replaceable widget until final image assets are supplied.
-
-### Before and after
-
-- Before: Generic centered Material login card.
-- After: Desktop-first launcher login matching the reference composition.
-
-### Verification
-
-- `fvm flutter analyze`: passed with no issues.
-- `fvm flutter test`: passed, including the 1280x720 login layout test.
-
-### Risks and rollback
-
-- Final visual fidelity depends on receiving the original banner, logo and news assets.
-- Rollback by reverting this task after explicit owner approval.
-
-### References
-
-- Ticket: LAU-003
-- Pull request: Not created
-- API/schema/design: User-provided login screen reference
-
-## [LAU-004] Add portable chat context
-
-- Date: 2026-09-03
-- Author: Codex (requested by project owner)
-- Type: Added, Documentation
-- Module: project communication, governance
-- Environments: all
-- Breaking change: No
-- Migration/configuration: No
-
-### Purpose
-
-Allow project context to move safely between machines and chat platforms.
-
-### Changes
-
-- Added `CHAT_CONTEXT.md` with the current compressed project context.
-- Defined the process for snapshots by day or requested point in time.
-- Preserved authorization boundaries so a snapshot never grants edit or Git
-  permissions to another agent.
-
-### Before and after
-
-- Before: Project context depended on the current conversation.
-- After: A structured, portable context file can bootstrap another session.
-
-### Verification
-
-- Checked the snapshot against `AGENTS.md`, recent changelog entries and Git
-  repository state.
-
-### Risks and rollback
-
-- Snapshots can become stale; repository state remains the source of truth.
-- Rollback by reverting this task after explicit owner approval.
-
-### References
-
-- Ticket: LAU-004
-- Pull request: Not created
-- API/schema/design: `CHAT_CONTEXT.md`
-
-## [LAU-005] Implement launcher self-update foundation
-
-- Date: 2026-09-04
-- Author: Codex (requested by project owner)
-- Type: Added, Changed, Security
-- Module: launcher updater, startup routing, Windows lifecycle
-- Environments: all
-- Breaking change: No
-- Migration/configuration: Configure launcher manifest URL and Ed25519 public key
-
-### Purpose
-
-Update the launcher before login with a Discord-style progress experience while
-avoiding a separately maintained updater application.
-
-### Changes
-
-- Added manifest checking, resumable ZIP download, size/SHA-256/signature checks
-  and safe staging extraction.
-- Added a startup update BLoC and compact updater screen before login.
-- Added a self-copy apply mode that switches launcher directories, performs a
-  startup health check and rolls back on failure.
-- Added update configuration, tests and release documentation.
-- Deferred game patching and game disk configuration to the next approved task.
-
-### Before and after
-
-- Before: Updater existed only as an empty domain interface.
-- After: Launcher updates are checked and prepared before login, with a Windows
-  self-apply path and rollback protection.
-
-### Verification
-
-- Injectable code generation completed successfully.
-- `fvm flutter analyze`: passed with no issues.
-- `fvm flutter test`: passed, 8 tests.
-- `git diff --check`: passed.
-- Final apply/rollback must also be tested using signed artifacts on Windows.
-
-### Risks and rollback
-
-- Installation directory must be writable and staging must remain on the same volume.
-- Rollback by reverting this task after explicit owner approval.
-
-### References
-
-- Ticket: LAU-005
-- Pull request: Not created
-- API/schema/design: `docs/architecture.md`
+- Analyzer sạch; 4 test thành công; Injectable codegen thành công.
+- Tại thời điểm task, build Windows release còn chờ Windows runner.

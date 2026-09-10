@@ -1,37 +1,37 @@
-# Project Governance
+# Quản trị dự án
 
-## Owner authorization
+## Quyền của chủ dự án
 
-Read-only inspection is the default. Creating, editing, moving or deleting a
-file requires explicit owner authorization for the current task. Authorization
-does not carry to another task. Unexpected scope must be approved before work
-continues.
+Mặc định chỉ được kiểm tra và lập kế hoạch ở chế độ read-only. Việc tạo, sửa,
+di chuyển hoặc xóa file cần chủ dự án cho phép rõ ràng trong task hiện tại.
+Quyền không tự chuyển sang task khác. Nếu phát sinh phạm vi ngoài dự kiến, phải
+dừng và xin phép trước khi tiếp tục.
 
-Commit authorization is separate from edit authorization. Never commit, amend,
-rebase, merge, push, tag, release, stash or discard changes without the exact
-permission required for that action.
+Quyền sửa file tách biệt với quyền commit. Không được commit, amend, rebase,
+merge, push, tag, release, stash hoặc loại bỏ thay đổi nếu chưa có đúng quyền
+cho thao tác đó.
 
-## Change workflow
+## Quy trình thay đổi
 
-1. Inspect without changing tracked files.
-2. Present the goal, approach, files and writing commands.
-3. Obtain owner authorization for the task.
-4. Change only the approved scope and append one `CHANGELOG.md` entry.
-5. Run checks and present the diff and results.
-6. Request separate authorization before creating a commit.
+1. Kiểm tra repository mà không thay đổi file tracked.
+2. Trình bày mục tiêu, cách làm, danh sách file và lệnh có khả năng ghi dữ liệu.
+3. Nhận sự cho phép của chủ dự án cho task hiện tại.
+4. Chỉ sửa phạm vi đã được duyệt và thêm đúng một entry vào `CHANGELOG.md`.
+5. Chạy kiểm tra, trình bày diff và kết quả xác minh.
+6. Xin quyền riêng trước khi tạo commit.
 
-## Ownership
+## Quyền sở hữu và yêu cầu review
 
-| Area | Owner | Required review |
+| Khu vực | Chủ sở hữu | Review bắt buộc |
 | --- | --- | --- |
-| Presentation/UI | Flutter/UI team | Feature owner |
-| Domain | Feature owner | Code leader |
-| Data/API/database | Developer/Senior | Feature owner |
-| Authentication/security | Security owner | Security + code leader |
-| Download/updater | Windows/Release owner | Two approvals |
-| Windows/installer | Windows/DevOps | Code leader + release |
-| Dependencies/FVM/lints | Code leader | Code leader |
-| CI/CD/signing | DevOps | Release + security |
-| `CHANGELOG.md` | Assigned contributor | Code leader |
+| Presentation/UI | Nhóm Flutter/UI | Chủ tính năng |
+| Domain | Chủ tính năng | Trưởng nhóm code |
+| Data/API/cơ sở dữ liệu | Developer/Senior | Chủ tính năng |
+| Xác thực/bảo mật | Chủ bảo mật | Bảo mật và trưởng nhóm code |
+| Tải dữ liệu/updater | Chủ Windows/Release | Hai người phê duyệt |
+| Windows/installer | Windows/DevOps | Trưởng nhóm code và release |
+| Dependency/FVM/lint | Trưởng nhóm code | Trưởng nhóm code |
+| CI/CD/ký artifact | DevOps | Release và bảo mật |
+| `CHANGELOG.md` | Người được giao | Trưởng nhóm code |
 
-Ownership never overrides the project owner's authorization requirement.
+Quyền sở hữu khu vực không thay thế yêu cầu xin phép chủ dự án.

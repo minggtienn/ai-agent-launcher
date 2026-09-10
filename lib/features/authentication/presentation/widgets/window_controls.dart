@@ -1,19 +1,19 @@
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
-import 'package:window_manager/window_manager.dart';
 
 final class LauncherTitleBar extends StatelessWidget {
   const LauncherTitleBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox(
+    return SizedBox(
       height: 36,
       child: Stack(
         children: [
           Positioned.fill(
-            child: DragToMoveArea(child: SizedBox.expand()),
+            child: MoveWindow(child: const SizedBox.expand()),
           ),
-          Positioned(top: 0, right: 0, child: WindowControls()),
+          const Positioned(top: 0, right: 0, child: WindowControls()),
         ],
       ),
     );
@@ -34,7 +34,7 @@ final class WindowControls extends StatelessWidget {
           backgroundColor: const Color(0xFF1C2634),
           hoverColor: const Color(0xFF31506F),
           iconColor: const Color(0xFFB9D9F5),
-          onPressed: windowManager.minimize,
+          onPressed: () => appWindow.minimize(),
         ),
         _WindowButton(
           icon: Icons.close,
@@ -42,7 +42,7 @@ final class WindowControls extends StatelessWidget {
           backgroundColor: const Color(0xFF3A2026),
           hoverColor: const Color(0xFFE5484D),
           iconColor: const Color(0xFFFFD7D9),
-          onPressed: windowManager.close,
+          onPressed: () => appWindow.close(),
         ),
       ],
     );
@@ -61,7 +61,7 @@ final class _WindowButton extends StatelessWidget {
 
   final IconData icon;
   final String tooltip;
-  final Future<void> Function() onPressed;
+  final VoidCallback onPressed;
   final Color backgroundColor;
   final Color hoverColor;
   final Color iconColor;

@@ -1,17 +1,17 @@
-# Agent Rules
+# Quy tắc dành cho agent
 
-These rules apply to every automated agent working in this repository.
+Các quy tắc này áp dụng cho mọi agent tự động làm việc trong repository.
 
-1. Default to read-only inspection and planning.
-2. Do not create, edit, move or delete files without explicit owner permission
-   for the current task.
-3. Before editing, state the intended scope and files. Stop for renewed approval
-   if unexpected scope appears.
-4. Every authorized task that changes the repository must append exactly one
-   entry to `CHANGELOG.md`.
-5. Edit permission never includes Git commit permission. Present the diff and
-   verification results, then wait for separate commit approval.
-6. Never amend, rebase, merge, push, tag, release, stash, discard or overwrite
-   user changes without explicit authorization for that exact operation.
-7. Never store passwords, access tokens, refresh tokens, signing keys or other
-   secrets in the repository or logs.
+1. Mặc định chỉ kiểm tra read-only và lập kế hoạch.
+2. Không tạo, sửa, di chuyển hoặc xóa file nếu chưa có sự cho phép rõ ràng của
+   chủ dự án cho task hiện tại.
+3. Trước khi sửa, phải nêu phạm vi và danh sách file dự kiến. Nếu phát sinh phạm
+   vi ngoài dự kiến, phải dừng và xin phép lại.
+4. Mỗi task được phép thay đổi repository phải thêm đúng một entry vào
+   `CHANGELOG.md`.
+5. Quyền sửa file không bao gồm quyền Git commit. Phải trình bày diff và kết quả
+   xác minh, sau đó chờ quyền commit riêng.
+6. Không amend, rebase, merge, push, tag, release, stash, loại bỏ hoặc ghi đè
+   thay đổi của người dùng nếu chưa có quyền rõ ràng cho chính xác thao tác đó.
+7. Không lưu mật khẩu, access token, refresh token, signing key hoặc secret khác
+   trong repository hay log.

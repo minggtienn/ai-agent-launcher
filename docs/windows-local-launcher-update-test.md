@@ -1,4 +1,4 @@
-# Test Launcher Update Local Trên Windows
+# Kiểm thử cập nhật launcher cục bộ trên Windows
 
 Tài liệu này hướng dẫn kiểm thử end-to-end launcher updater hiện tại bằng hai
 bản build local, một HTTP server local và một thư mục cài đặt tạm. Không chạy
@@ -25,9 +25,9 @@ staging hoặc production.
 Trên Windows 10/11 x64 cần có:
 
 1. Git.
-2. FVM `3.1.3` và Flutter `3.44.4` đã được FVM cài đặt.
+2. FVM `4.3.0`, Flutter `3.44.4` và Dart `3.12.2`.
 3. Visual Studio 2022 với workload **Desktop development with C++**.
-4. Python 3 để chạy HTTP server local, hoặc một static HTTP server tương đương.
+4. Dart SDK đi kèm Flutter để chạy `local_update_feed/server.dart`.
 5. PowerShell.
 
 Mở PowerShell tại một thư mục test riêng và kiểm tra môi trường:
@@ -131,8 +131,8 @@ nhận được:
   "signature": "",
   "entryExecutable": "ai_agent_launcher.exe",
   "releaseNotes": [
-    "Local launcher updater test",
-    "Verify download, staging, apply and health check"
+    "Kiểm thử launcher updater cục bộ",
+    "Xác minh tải, staging, apply và health check"
   ]
 }
 ```
@@ -224,9 +224,8 @@ Kết quả mong đợi:
 - Bản mới mở và vào login, chứng minh health marker đã được ghi.
 - HTTP server ghi nhận request `latest.json` và ZIP.
 
-Phiên bản package mới cũng có thể được xác nhận bằng Properties của executable
-hoặc bằng UI sau khi footer được chuyển sang đọc `PackageInfo`. Footer login
-hiện còn là text tĩnh nên không dùng nó làm bằng chứng version ở thời điểm này.
+Version mới có thể được xác nhận bằng thuộc tính của executable hoặc footer UI;
+footer đăng nhập hiện đọc trực tiếp `PackageInfo` của executable đang chạy.
 
 ## 10. Các ca lỗi nên kiểm tra
 

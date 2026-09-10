@@ -1,4 +1,4 @@
-# Portable Chat Context
+# Ngữ cảnh hội thoại có thể chuyển giao
 
 File này là bản nén ngữ cảnh để tiếp tục dự án trên máy hoặc nền tảng khác.
 Đây không phải lịch sử chat nguyên văn và không được chứa mật khẩu, token, khóa
@@ -44,7 +44,7 @@ Khi chủ dự án yêu cầu `nén đoạn chat`, agent phải:
 9. Ghi đủ trạng thái repository, quyết định, việc hoàn thành, giới hạn, bước
    tiếp theo và quyền được cấp.
 
-## Compression Baseline
+## Mốc nén
 
 - Baseline ID: `BASELINE-20260908-002`
 - Marked at: `2026-09-08T09:24:38+07:00`
@@ -53,9 +53,9 @@ Khi chủ dự án yêu cầu `nén đoạn chat`, agent phải:
 - Mốc không cấp quyền sửa file, chạy lệnh ghi dữ liệu, commit hoặc push cho task
   tương lai.
 
-## Current Snapshot
+## Snapshot hiện tại
 
-### Metadata
+### Siêu dữ liệu
 
 - Snapshot ID: `CTX-20260908-003`
 - Compressed at: `2026-09-08T09:24:38+07:00`
@@ -69,7 +69,7 @@ Khi chủ dự án yêu cầu `nén đoạn chat`, agent phải:
 - Trạng thái sau task nén: `CHAT_CONTEXT.md` và `CHANGELOG.md` đã sửa nhưng
   chưa commit; không có source code nào thay đổi.
 
-### New context since previous baseline
+### Ngữ cảnh mới kể từ mốc trước
 
 - Đã có tài liệu thao tác end-to-end tại
   `docs/windows-local-launcher-update-test.md`: chuẩn bị Windows/FVM, build hai
@@ -83,7 +83,7 @@ Khi chủ dự án yêu cầu `nén đoạn chat`, agent phải:
 - Link share chat chỉ mang nội dung hội thoại theo quyền truy cập của nền tảng;
   nó không thay thế repository và không truyền quyền thao tác Git/file local.
 
-### Product order and architecture still in effect
+### Thứ tự sản phẩm và kiến trúc vẫn có hiệu lực
 
 1. Launcher update bắt buộc chạy trước login.
 2. Sau đó hoàn thiện login.
@@ -91,14 +91,14 @@ Khi chủ dự án yêu cầu `nén đoạn chat`, agent phải:
 4. Sau login mới kiểm tra/cập nhật game bằng patch chain tuần tự.
 5. Game installer/updater về sau phải chọn thư mục/ổ đĩa và kiểm tra dung lượng.
 
-- Windows 10/11 x64; Flutter `3.44.4`, Dart `3.12.2`, FVM `3.1.3`.
+- Windows 10/11 x64; Flutter `3.44.4`, Dart `3.12.2`, FVM `4.3.0`.
 - Feature-first Clean Architecture; BLoC/Cubit; GetIt + Injectable; Dio; Drift;
   secure storage; custom Material 3.
 - `dev`, `staging`, `prod` cấu hình bằng `--dart-define`.
 - Custom ZIP updater; không dùng `auto_updater`/WinSparkle và không duy trì dự
   án updater thứ hai.
 
-### Implemented launcher update behavior
+### Hành vi cập nhật launcher đã triển khai
 
 - Kiểm tra REST manifest trước login, tải có resume bằng HTTP Range.
 - Kiểm size, SHA-256 và Ed25519; `ALLOW_UNSIGNED_UPDATES=true` chỉ dành local.
@@ -110,7 +110,7 @@ Khi chủ dự án yêu cầu `nén đoạn chat`, agent phải:
 - Cấu hình build: `LAUNCHER_UPDATE_MANIFEST_URL`,
   `LAUNCHER_UPDATE_PUBLIC_KEY`, `ALLOW_UNSIGNED_UPDATES`.
 
-### Verification and remaining risks
+### Xác minh và rủi ro còn lại
 
 - Kết quả code gần nhất được ghi nhận: Injectable codegen thành công,
   `flutter analyze` sạch và `flutter test` 8/8 pass.
@@ -119,11 +119,11 @@ Khi chủ dự án yêu cầu `nén đoạn chat`, agent phải:
   artifact production đã ký.
 - Thư mục cài phải ghi được; staging/current phải cùng volume.
 - Cleanup backup/runtime tạm chưa hoàn thiện.
-- Login còn asset placeholder và footer version tĩnh; backend/OpenAPI chưa có.
+- Login còn asset tạm; footer đã đọc version runtime; backend/OpenAPI chưa có.
 - Game updater, disk selection/free-space, Drift schema, tray, single-instance
   và game process launcher chưa hoàn thiện production.
 
-### Next recommended tasks
+### Các task tiếp theo được đề xuất
 
 1. Chạy tài liệu local updater test trên máy Windows và ghi kết quả thực tế.
 2. Sửa lỗi Windows file locking, permission hoặc rollback nếu phát hiện.
@@ -132,7 +132,7 @@ Khi chủ dự án yêu cầu `nén đoạn chat`, agent phải:
 5. Thiết kế vị trí cài game, kiểm tra dung lượng và Drift schema.
 6. Triển khai patch-chain game updater rồi home/sidebar/tab UI.
 
-### Authorization state
+### Trạng thái quyền hạn
 
 - Task hiện tại chỉ cho phép cập nhật `CHAT_CONTEXT.md` và `CHANGELOG.md` để
   hoàn thiện snapshot.
@@ -140,7 +140,7 @@ Khi chủ dự án yêu cầu `nén đoạn chat`, agent phải:
 - Không có quyền commit, push, merge, tag hoặc release.
 - Quyền của task này không chuyển sang task tiếp theo.
 
-## Snapshot History
+## Lịch sử snapshot
 
 ### CTX-20260907-002
 
